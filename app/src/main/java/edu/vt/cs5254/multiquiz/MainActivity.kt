@@ -1,37 +1,176 @@
 package edu.vt.cs5254.multiquiz
 
+import android.app.Activity
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.View
 import android.widget.Button
-import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.result.contract.ActivityResultContract
 import com.google.android.material.snackbar.Snackbar
+import kotlin.collections.forEach
+import androidx.activity.viewModels
+
+
+import edu.vt.cs5254.multiquiz.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     //James Smith
-    //PID - 906065811
-    private lateinit var trueButton: Button
-    private lateinit var falseButton: Button
+    //PID - jfs8888
+    private lateinit var binding: ActivityMainBinding
+    private val multiQuizModel: QuizViewModel by viewModels()
+    lateinit var answerButtonList: List<Button>
+
+    private val resultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        multiQuizModel.gotoNextQuestion()
+        if (result.resultCode == Activity.RESULT_OK) {
+            multiQuizModel.newProblemRemaining = result.data?.getBooleanExtra(EXTRA_RESET_ALL, false)?:false
+        }
+        multiQuizModel.resetAll()
+        updateProblem()
+        updateButtons()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        answerButtonList = listOf(
+            binding.answer0Button,
+            binding.answer1Button,
+            binding.answer2Button,
+            binding.answer3Button
+        )
 
-        trueButton = findViewById(R.id.true_button)
-        falseButton = findViewById(R.id.false_button)
-
-        trueButton.setOnClickListener { view ->
-            Snackbar.make(
-                view,
-                R.string.correct_toast,
-                Snackbar.LENGTH_SHORT).show()
+        updateButtons()
+        updateProblem()
         }
 
-        falseButton.setOnClickListener { view ->
-            Snackbar.make(
-                view,
-                R.string.incorrect_toast,
-                Snackbar.LENGTH_SHORT).show()
+    private fun updateProblem(){
+        binding.questionTextView.setText(multiQuizModel.question);
+        answerButtonList.zip(multiQuizModel.answerList).forEach {
+                (button,answer) -> button.setText(answer.textResId)
+        }
+        answerButtonList.zip(multiQuizModel.answerList).forEach{
+                (button,answer)->
+            button.setOnClickListener {
+                answerClickedEvent(answer)
+            }
+        }
+
+        binding.hintButton.setOnClickListener {
+            hintClickedEvent()
+        }
+        binding.submitButton.setOnClickListener {
+            submitClickedEvent()
         }
     }
+
+    private fun answerClickedEvent(answer: Answer){
+        answer.isSelected = !answer.isSelected
+        multiQuizModel.answerList.filter { it!=answer}.forEach{it.isSelected=false}
+        updateButtons()
+    }
+
+    private fun hintClickedEvent(){
+        multiQuizModel.giveHint()
+        updateButtons()
+    }
+
+    private fun submitClickedEvent(){
+        multiQuizModel.countCorrect()
+        if(multiQuizModel.lastQuestion()){
+            jumpToResultActivity()
+        }else{
+            multiQuizModel.gotoNextQuestion()
+            updateProblem()
+            updateButtons()
+        }
+    }
+
+    private fun jumpToResultActivity(){
+        val intent = ResultsActivity.newIntent(
+            this@MainActivity,
+            multiQuizModel.correctAnswers,
+            multiQuizModel.totalQuestions,
+            multiQuizModel.hintsUsed
+        )
+        resultLauncher.launch(intent)
+    }
+
+    private fun updateButtons(){
+        updateAnswerButtons()
+        updateHintButton()
+        updateSubmitButton()
+    }
+
+    //update the button status,based on the answer states
+    private fun updateAnswerButtons(){
+        answerButtonList.zip(multiQuizModel.answerList).forEach{
+                (button,answer) ->
+            button.isSelected = answer.isSelected
+            button.isEnabled = answer.isEnabled
+            button.updateColor()
+        }
+
+    }
+
+    private fun updateSubmitButton(){
+        binding.submitButton.isEnabled = multiQuizModel.answerList.any { it.isSelected }
+    }
+
+    private fun updateHintButton(){
+        binding.hintButton.isEnabled =
+            multiQuizModel.answerList.filterNot { it.isCorrect }.any { it.isEnabled }
+    }
+
+//    private fun updateQuestion() {
+//        answerButtonList.zip(multiQuizModel.answerList).forEach { (button, answer) ->
+//            button.setOnClickListener {
+//                answerButtonClick(answer)
+//            }
+//        }
+//        binding.hintButton.setOnClickListener {
+//            hintButtonClick()
+//        }
+//        binding.submitButton.setOnClickListener {
+//            resetButtonClick()
+//        }
+//    }
+//
+//    private fun answerButtonClick(answer: Answer) {
+//        val answerSelected = answer.isSelected
+//        multiQuizModel.answerList.forEach { it.isSelected = false }
+//        answer.isSelected = !answerSelected
+//        binding.submitButton.isEnabled = answer.isSelected
+//        updateQuizView()
+//    }
+//
+//    private fun hintButtonClick() {
+//        multiQuizModel.giveHint()
+//        binding.hintButton.isEnabled = false
+//        updateQuizView()
+//    }
+//
+//    private fun resetButtonClick() {
+//        binding.hintButton.isEnabled = true
+//        answerButtonList.zip(multiQuizModel.answerList).forEach { (button, answer) ->
+//            button.isEnabled = answer.isEnabled
+//            button.isSelected = answer.isSelected
+//            button.updateColor()}
+//        updateQuizView()
+//    }
+//
+//    private fun updateQuizView() {
+//        binding.questionTextView.setText(multiQuizModel.questionText)
+//        answerButtonList.zip(multiQuizModel.answerList)
+//            .forEach { (button, answer) -> button.setText(answer.textResId) }
+//
+//        answerButtonList.zip(multiQuizModel.answerList).forEach { (button, answer) ->
+//            button.isEnabled = answer.isEnabled
+//            button.isSelected = answer.isSelected
+//            button.updateColor()
+//        }
+//    }
 }
