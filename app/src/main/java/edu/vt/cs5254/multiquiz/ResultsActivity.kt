@@ -6,7 +6,6 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import edu.vt.cs5254.multiquiz.databinding.ActivityMainBinding
 import edu.vt.cs5254.multiquiz.databinding.ActivityResultsBinding
 
 private const val EXTRA_TOTAL_QUESTIONS = "edu.vt.cs5254.multiquiz.submitted_answers"
@@ -27,7 +26,7 @@ class ResultsActivity : AppCompatActivity() {
         binding = ActivityResultsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        totalQuestions = intent.getIntExtra(EXTRA_TOTAL_QUESTIONS, -1)
+        totalQuestions = intent.getIntExtra(EXTRA_TOTAL_QUESTIONS, 0)
         correctAnswers = intent.getIntExtra(EXTRA_TOTAL_CORRECT, 0)
         hintsUsed = intent.getIntExtra(EXTRA_TOTAL_HINTS, 0)
 
@@ -51,10 +50,17 @@ class ResultsActivity : AppCompatActivity() {
     }
 
     private fun showScore() {
+        correctAnswers
         binding.correctAnswersValue.text = correctAnswers.toString()
         binding.submittedAnswersValue.text = totalQuestions.toString()
         binding.hintsUsedValue.text = hintsUsed.toString()
     }
+
+//    private fun showScore() {
+//        binding.correctAnswersValue.text = correctAnswers.toString()
+//        binding.submittedAnswersValue.text = totalQuestions.toString()
+//        binding.hintsUsedValue.text = hintsUsed.toString()
+//    }
 
     companion object {
         fun newIntent(

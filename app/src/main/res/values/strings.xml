@@ -7,23 +7,23 @@
     <string name="australia_2_answer">MELBOURNE</string>
     <string name="australia_3_answer">SYDNEY</string>
 
-    <string name="oceanQuestion">Which is the biggest Ocean?</string>
+    <string name="oceanQuestion">Which is the largest Ocean?</string>
     <string name="ocean_0_answer">Indian</string>
     <string name="ocean_1_answer">Pacific</string>
     <string name="ocean_2_answer">Arctic</string>
     <string name="ocean_3_answer">Atlantic</string>
 
-    <string name="landSizeQuestion">Which is the biggest land of the world?</string>
+    <string name="landSizeQuestion">What is the largest continent of the world?</string>
     <string name="landSize_0_answer">Africa</string>
     <string name="landSize_1_answer">America</string>
     <string name="landSize_2_answer">Asia</string>
     <string name="landSize_3_answer">Europe</string>
 
-    <string name="richestQuestion">Who is the richest person int the world(2022)?</string>
-    <string name="richest_0_answer">Jeff Bezos</string>
-    <string name="richest_1_answer">Bill Gates</string>
-    <string name="richest_2_answer">Larry Page</string>
-    <string name="richest_3_answer">Elon Musk</string>
+    <string name="letterQuestion">Which one is the letter D?</string>
+    <string name="letter_0_answer">A</string>
+    <string name="letter_1_answer">B</string>
+    <string name="letter_2_answer">C</string>
+    <string name="letter_3_answer">D</string>
 
     <string name="hint_button">HINT</string>
     <string name="submit_button">SUBMIT</string>
@@ -32,8 +32,8 @@
     <string name="incorrect_info">Incorrect!</string>
 
     <string name="results_header">Results</string>
-    <string name="correct_answers">Correct Answers:</string>
-    <string name="submitted_answers">Submitted Answers: </string>
+    <string name="submitted_answers">Correct Answers:</string>
+    <string name="correct_answers">Submitted Answers: </string>
     <string name="hints_used">Hints Used:</string>
     <string name="reset_all">Reset All</string>
 </resources>

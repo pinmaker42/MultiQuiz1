@@ -29,22 +29,22 @@ class QuizViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
                 Answer(R.string.landSize_2_answer,true),
                 Answer(R.string.landSize_3_answer,false)
             )),
-        Question(R.string.richestQuestion,
+        Question(R.string.letterQuestion,
             listOf(
-                Answer(R.string.richest_0_answer,false),
-                Answer(R.string.richest_1_answer,false),
-                Answer(R.string.richest_2_answer,false),
-                Answer(R.string.richest_3_answer,true)
+                Answer(R.string.letter_0_answer,false),
+                Answer(R.string.letter_1_answer,false),
+                Answer(R.string.letter_2_answer,false),
+                Answer(R.string.letter_3_answer,true)
             )
         )
     )
+    var submittedAnswer = 0
     var questionIndex = 0
-
     var correctAnswers = 0
     val totalQuestions = questionBank.size
-    var hintsUsed =0
-    //val questionText get() = questionBank[questionIndex].textResId
-    val answerList get() = questionBank[questionIndex].answer
+    var hintsUsed = 0
+    val answerList
+        get() = questionBank[questionIndex].answer
 
     var newProblemRemaining :Boolean
         get() = savedStateHandle.get(IS_NEW_PROBLEM_REMAINING) ?: true
@@ -56,8 +56,9 @@ class QuizViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
     val answer
         get() = questionBank[questionIndex].answer
 
-    fun gotoNextQuestion() {
+    fun goToNextQuestion() {
         questionIndex = (questionIndex + 1) % questionBank.size
+        submittedAnswer ++
     }
 
     fun countCorrect() {
@@ -65,24 +66,28 @@ class QuizViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
         questionBank.forEach {
             it.answer.forEach { answer->
                 if (answer.isSelected)
-                    count++
+                    count ++
             }
         }
         correctAnswers = count
     }
     fun giveHint() {
-        val hideAnswer = answer
-            .filter { !it.isCorrect }
-            .filter { it.isEnabled }
+        val hideHintAnswer = answer
+            .filter {
+                !it.isCorrect
+            }
+            .filter {
+                it.isEnabled
+            }
             .random()
-        hideAnswer.isEnabled = false
-        hideAnswer.isSelected = false
+        hideHintAnswer.isEnabled = false
+        hideHintAnswer.isSelected = false
         hintsUsed ++
     }
 
     fun lastQuestion(): Boolean {
         val result = questionIndex == questionBank.size-1
-        if (result)
+        if (result) //result == true
             newProblemRemaining = false
         return result
     }
@@ -92,6 +97,7 @@ class QuizViewModel(private val savedStateHandle: SavedStateHandle) : ViewModel(
             return
             correctAnswers = 0
             hintsUsed = 0
+            submittedAnswer = 0
         questionBank.forEach {
             it.answer.forEach { answer ->
                 answer.isEnabled = true
